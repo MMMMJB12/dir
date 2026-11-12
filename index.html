@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مركز النجوم للإلكترونيات - متجر الألعاب</title>
+    <style>
+        :root {
+            --bg-color: #090d16;
+            --card-bg: rgba(30, 41, 59, 0.88);
+            --primary: #3b82f6;
+            --accent: #22c55e;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+            --danger: #ef4444;
+        }
+        * { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text);
+            margin: 0;
+            padding-bottom: 120px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* جعل صورة God of War Ragnarok الخلفية المتحركة الكاملة للموقع */
+        .gaming-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2;
+            overflow: hidden;
+            background: #090d16;
+        }
+        .bg-slider {
+            position: absolute;
+            top: -10%; left: -10%; width: 120%; height: 120%;
+            background-image: url('images/God of War Ragnarok[CUSA34390].jpg');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.22;
+            filter: blur(6px);
+            animation: slowPan 35s infinite alternate ease-in-out;
+        }
+        @keyframes slowPan {
+            0% { transform: scale(1) translate(0, 0); }
+            100% { transform: scale(1.12) translate(-25px, -25px); }
+        }
+
+        /* شريط العروض المتحرك العلوي */
+        .marquee-bar {
+            background: #1d4ed8;
+            color: white;
+            padding: 8px 0;
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 25s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        header {
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(12px);
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+        header h1 { margin: 0 0 5px 0; font-size: 1.4rem; color: #60a5fa; }
+        header p { margin: 0 0 12px 0; font-size: 0.8rem; color: var(--text-muted); }
+
+        .search-container {
+            display: flex;
+            gap: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+            flex-wrap: wrap;
+        }
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: 1px solid #475569;
+            background: rgba(15, 23, 42, 0.9);
+            color: white;
+            font-size: 0.9rem;
+            outline: none;
+        }
+        .search-box:focus { border-color: var(--primary); }
+        
+        .btn-request-modal {
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        /* أزرار التصنيفات السريعة */
+        .categories-bar {
+            max-width: 1200px;
+            margin: 15px auto 5px;
+            padding: 0 15px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .categories-bar::-webkit-scrollbar { display: none; }
+        .cat-btn {
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid #475569;
+            color: var(--text);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: 0.2s;
+        }
+        .cat-btn.active, .cat-btn:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 15px auto;
+            padding: 0 15px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 15px;
+        }
+        .game-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(6px);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .game-card:hover { transform: translateY(-4px); border-color: rgba(59, 130, 246, 0.5); }
+        .game-card.selected { border: 2px solid var(--accent); box-shadow: 0 0 15px rgba(34, 197, 94, 0.3); }
+        .game-img {
+            width: 100%;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            background: #0f172a;
+        }
+        .game-info {
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: space-between;
+        }
+        .game-title {
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            word-break: break-word;
+            direction: ltr;
+            text-align: center;
+        }
+        .btn-add {
+            width: 100%;
+            padding: 8px;
+            border: none;
+            border-radius: 8px;
+            background: var(--primary);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .game-card.selected .btn-add { background: var(--accent); color: #000; }
+
+        /* نافذة طلب لعبة غير موجودة */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-content {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 15px;
+            max-width: 400px;
+            width: 100%;
+            border: 1px solid #475569;
+            text-align: center;
+        }
+        .modal-content h3 { margin-top: 0; color: #60a5fa; }
+        .modal-content input {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border: 1px solid #475569;
+            background: #0f172a;
+            color: white;
+            outline: none;
+        }
+        .modal-btns { display: flex; gap: 10px; }
+        .btn-submit-req { background: var(--accent); color: black; flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-close-req { background: var(--danger); color: white; flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
+        /* بانر معلومات المحل السفلي */
+        .store-footer {
+            background: rgba(15, 23, 42, 0.95);
+            border-top: 1px solid #334155;
+            text-align: center;
+            padding: 12px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 30px;
+        }
+
+        /* شريط السلة السفلي العائم */
+        .cart-bar {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(12px);
+            border-top: 2px solid var(--primary);
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 200;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.6);
+        }
+        .cart-count { font-weight: bold; font-size: 0.95rem; }
+        .btn-whatsapp {
+            background: #25d366;
+            color: #000;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-whatsapp:disabled { background: #475569; color: #94a3b8; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+
+<div class="gaming-bg"><div class="bg-slider"></div></div>
+
+<!-- شريط العروض المتحرك -->
+<div class="marquee-bar">
+    <div class="marquee-content">
+        🎮 أهلاً بكم في مركز النجوم للإلكترونيات - النجف حي السلام | توفير أحدث ألعاب PS4 وتحديثات النظام وصيانة الهاردوير | لم تجد لعبتك؟ استخدم زر "اطلب لعبتك" وسنلبي طلبك فوراً! 🚀
+    </div>
+</div>
+
+<header>
+    <h1>🎮 مركز النجوم للإلكترونيات</h1>
+    <p>تصفح أضخم مكتبة ألعاب واطلبها مباشرة عبر الواتساب</p>
+    <div class="search-container">
+        <input type="text" id="searchInput" class="search-box" placeholder="ابحث عن اسم اللعبة هنا..." onkeyup="filterGames()">
+        <button class="btn-request-modal" onclick="openModal()">🔍 اطلب لعبتك</button>
+    </div>
+</header>
+
+<!-- تصنيفات سريعة -->
+<div class="categories-bar">
+    <button class="cat-btn active" onclick="setCategory('all', this)">✨ الكل</button>
+    <button class="cat-btn" onclick="setCategory('fifa', this)">⚽ ألعاب الرياضة (FIFA)</button>
+    <button class="cat-btn" onclick="setCategory('gta', this)">🚗 سلاسل GTA</button>
+    <button class="cat-btn" onclick="setCategory('cod', this)">🎯 كول آف ديوتي (COD)</button>
+    <button class="cat-btn" onclick="setCategory('god', this)">⚔️ ألعاب الأكشن (God of War)</button>
+</div>
+
+<div class="container" id="gamesGrid"></div>
+
+<!-- معلومات المحل في الأسفل -->
+<div class="store-footer">
+    📍 النجف - حي السلام | مركز النجوم للإلكترونيات لبرمجة وصيانة الألعاب والأنظمة 🎮
+</div>
+
+<!-- نافذة طلب لعبة غير موجودة -->
+<div class="modal" id="requestModal">
+    <div class="modal-content">
+        <h3>طلب لعبة غير موجودة</h3>
+        <p style="font-size: 0.85rem; color: var(--text-muted);">اكتب اسم اللعبة التي تبحث عنها وسنرسل الطلب مباشرة إلى واتساب المحل لتوفيرها لك:</p>
+        <input type="text" id="missingGameName" placeholder="اكتب اسم اللعبة هنا...">
+        <div class="modal-btns">
+            <button class="btn-submit-req" onclick="sendMissingGame()">إرسال الطلب 📲</button>
+            <button class="btn-close-req" onclick="closeModal()">إلغاء</button>
+        </div>
+    </div>
+</div>
+
+<div class="cart-bar">
+    <div class="cart-count">الألعاب المختارة: <span id="selectedCount">0</span></div>
+    <button class="btn-whatsapp" id="sendBtn" onclick="sendToWhatsApp()" disabled>
+        إرسال الطلب واتساب 📲
+    </button>
+</div>
+
+<script>
+    const WHATSAPP_NUMBER = "9647840022295";
+    let currentCategory = 'all';
+
+    const imageFiles = [
+        "A WAY 0UT=UP0006-CUSA07995_00.jpg",
+        "Aaru's Awakening (EU  US).jpg",
+        "Air Conflicts Double Pack.jpg",
+        "ALIEN.ISOLATION.EUR.PS4.jpg",
+        "Among the Sleep.jpg",
+        "among.jpg",
+        "Assassin's Creed Mirage[CUSA33151].jpg",
+        "Assassin's Creed Origins Arabic with 1.41.jpg",
+        "Assassin's Creed Rogue   Remastered.jpg",
+        "Assassin's Creed Syndicate[CUSA02378].jpg",
+        "Assassin's Creed Unity Arabic PS4.jpg",
+        "Assassins Creed Freedom Cry.jpg",
+        "Assassins Creed Valhalla Ultimate Edition v7.20[CUSA18522][Optional FIX].jpg",
+        "Assassins Creed Valhalla Ultimate Edition[CUSA18522][DAWN OF RAGNAROK DLC].jpg",
+        "Assassins Creed Valhalla Ultimate Edition[CUSA18522][THE SIEGE OF PARIS DLC].jpg",
+        "Assassins Creed Valhalla Ultimate Edition[CUSA18522][Wrath of the Druids DLC].jpg",
+        "Assassins.Creed.IV.Black.Flag.PS4-DUPLEX.jpg",
+        "Assassin's Creed  Chronicles Trilogy Pack[CUSA03440].jpg",
+        "Assetto Corsa Competizion[CUSA17266].jpg",
+        "ASSETTO CORSA.jpg",
+        "attack on titan wings of freedom.jpg",
+        "BATMAN ARKHAM CITYE[CUSA02000].jpg",
+        "Batman Arkham Knight (CUSA00135).jpg",
+        "Batman Return to Arkham Arkham Asylum.jpg",
+        "Battlefield 1 Revolution[CUSA02387].jpg",
+        "Battlefield 4 BY NABEEL.jpg",
+        "Battlefield Hardline[CUSA00625].jpg",
+        "Battlefield V.jpg",
+        "Beyond Two Souls.jpg",
+        "Bioshock.Infinite ps4.jpg",
+        "black.jpg",
+        "blak ops 6.jpg",
+        "blakops2.jpg",
+        "Call of Duty  Black Ops Cold War[CUSA15010][Zombies Base Installl.DLC].jpg",
+        "Call of Duty  Modern Warfare[CUSA08829][Campaign.Pack DLC Pack 2].jpg",
+        "Call of Duty Advanced Warfare.jpg",
+        "Call of Duty Black Ops III.jpg",
+        "Call of Duty Infinite Warfare.jpg",
+        "call of duty modern warfare 2[CUSA34029][CONTENT 2 LICENSE DLC].jpg",
+        "Call of Duty Modern Warfare 3[CUSA23827][Multiplayer.Pack].jpg",
+        "Call of Duty Modern Warfare Remastered.jpg",
+        "Call of Duty Vanguard [CUSA29092][Campaign.Base..DLC].jpg",
+        "Call of Duty WWII PS4 5.05UP0002-CUSA05969_00.jpg",
+        "CONTROL[CUSA11454].jpg",
+        "crash 4 it's about time[CUSA23470].jpg",
+        "Crash Bandicoot N. Sane Trilogy[DLC 1].jpg",
+        "Crash Team Racing Nitro Fueled[CUSA14876].jpg",
+        "Cuphead Delicious Last Course[CUSA20499][Update 1.04][FIX5.05.6.72.7.02].jpg",
+        "dark lan.jpg",
+        "DARK SOULS III The Fire Fades Edition PS4.jpg",
+        "Days Gone[CUSA15027].jpg",
+        "Days Gone[CUSA15027][Update v1.51].jpg",
+        "Dead Island - Definitive Edition.jpg",
+        "DEAD OR ALIVE 5 LAST ROUND (CUSA01778).jpg",
+        "Deadlight Directors Cut.jpg",
+        "Deadpool.PS4-DUPLEX.jpg",
+        "Death Stranding[CUSA12605]FIX 5.05].jpg",
+        "Detroit Become Human[CUSA09417][UPDATE v1.08].jpg",
+        "DETROIT[CUSA08344].jpg",
+        "Devil.May.Cry.5.PS4-DUPLEX 6.72.jpg",
+        "DiRT Rally 2.0 6.72.jpg",
+        "DIRT4.jpg",
+        "Disney Classic Games Aladdin and The Lion King.jfif",
+        "DRAGON BALL Z FIGHTER =EP0700-CUSA08992_00.jpg",
+        "Dragonball Xenoverse 2.jpg",
+        "DreamWorks Dragons Dawn of New Riders.jpg",
+        "Drive Club.jpg",
+        "Dying Light PS4.jpg",
+        "eFootball 2026 BITBOX GAME[CUSA18648].jpg",
+        "eFootball PES 2020 By Mustafa.jpg",
+        "eFootball PES 2021[CUSA18740][Smoke Patch V3 21.3.6[Fix 5.05-6.72-7.02].jpg",
+        "Elden Ring[CUSA28863].jpg",
+        "Fallout 4.jpg",
+        "FAR CRY 5[CUSA05904].jpg",
+        "Far Cry Primal.jpg",
+        "FARCR5.jpg",
+        "farcry6.jpg",
+        "Fat Princess Adventures.jpg",
+        "FIFA 17 Arabic.jpg",
+        "FIFA 18 Arabic.jpg",
+        "fifa 19[CUSA11609].jpg",
+        "FIFA 26[CUSA52342].jpg",
+        "FIFA.20[CUSA15545].jpg",
+        "FIFA.20[CUSA15545][FIX 5.05].jpg",
+        "Final Fantasy VII.jpeg",
+        "flatout 4 total insanity ps4.jpg",
+        "FORBIDDEN SIREN.jpg",
+        "Ghost of Tsushima Directors Cut[CUSA11456].jpg",
+        "Ghostbusters PS4.jpg",
+        "god of war 1 (2).jpg",
+        "god of war 1.jpg",
+        "GOD OF WAR 4.jpg",
+        "God of War Ragnarok[CUSA34390].jpg",
+        "God of War Ragnarok[CUSA34390][DELUXE PACK DLC FXD].jpg",
+        "god of war3.jpg",
+        "God of War[CUSA07410].jpg",
+        "Godzilla (USA).jpg",
+        "Gran Turismo Sport-CUSA02168_00.jpg",
+        "Gran Turismo Sport[CUSA02168].jpg",
+        "Gran Turismo SPORT[CUSA02168][Update 1.61].jpg",
+        "Gravity.Rush.2.PS4-DUPLEX.jpg",
+        "GTA BY NABEEL.jpg",
+        "gta san.jpg",
+        "gta3.jpg",
+        "HITMAN STEELBOOK EDITION=EP0082-CUSA06508_00.jpg",
+        "horizon zero dawn=EP9000-CUSA07319_00.jpg",
+        "Hustle Kings VR.jpg",
+        "Injustice 2 Legendary Edition[CUSA10688].jpg",
+        "Injustice 2 Legendary Edition[CUSA10688][UPDATE 104].jpg",
+        "INSIDE.jpg",
+        "It Takes Two[CUSA16746].jpg",
+        "J-Stars.Victory.Vs.Plus.PS4-DUPLEX.jpg",
+        "JUMP FORCE [CUSA11638].jpeg",
+        "Just Cause 3 Arabic Edition.jpg",
+        "Just Cause 4 Gold Edition[CUSA09254].jpg",
+        "Kena Bridge of Spirits[CUSA24853].jpg",
+        "Layers of Fear.jpg",
+        "LEGO Batman 3 Beyond Gotham.jpg",
+        "LEGO WORLD.jpg",
+        "LIMBO.jpg",
+        "Little Nightmares (CUSA05952).jpg",
+        "Lords of the Fallen DUPLEX.jpg",
+        "Mad Max.jpg",
+        "Mafia Definitive Edition[CUSA18100][ARBIC Fix 5.05-6.72-7.02].jpg",
+        "Mafia II Definitive Edition[CUSA16990].jpg",
+        "Mafia III.jpg",
+        "Mass Effect  Andromeda Game.jpg",
+        "Metal Gear Solid V The-Definitive Experience-=EP0101-CUSA05597_00.jpg",
+        "Metro Exodus[USA11407][Update v1.08][FIX 6.72].jpg",
+        "Metro.Redux.PS4-BlaZe.jpg",
+        "Minecraft Dungeons[CUSA18779][FIX 5.05].jpg",
+        "Minecraft PlayStation 4 Edition.jpg",
+        "MONSTER HUNTER WORLD=EP0102-CUSA07708_00.jpg",
+        "Moons of Madness.jpg",
+        "Mortal Combat Arcade Kollection.jpg",
+        "Mortal Kombat 11[Update.v1.11][CUSA11379].jpg",
+        "mortal kombat shaolin monks.jpg",
+        "mortal kombat xL.jpg",
+        "MotoGP 17 PS4.jpg",
+        "MotoGP 21[CUSA25612].jpg",
+        "Motorcycle Club.jpg",
+        "NARUTO SHIPPUDEN Ultimate Ninja STORM 4 ROAD TO BORUTO Arabic.jpg",
+        "NARUTO TO BORUTO SHINOBI STRIKER[CUSA08767].jpg",
+        "NBA 2K20[CUSA16386].jpg",
+        "Need For Speed Heat.jpg",
+        "Need for Speed Hot Pursuit Remastered[CUSA23265].jpg",
+        "Need for Speed Payback.jpg",
+        "need for speed RIVALS.jpg",
+        "Nier.Automata.PS4-DUPLEX.jpg",
+        "One Piece Pirate Warriors 3.jpg",
+        "One Piece Pirate Warriors 4[CUSA17226].jpg",
+        "One.Piece.Burning.Blood.PS4-DUPLEX.jpg",
+        "Outlast 2.jpg",
+        "Overcooked 2[CUSA10940].jpeg",
+        "pen 10.jpg",
+        "Persona.5.PS4-DUPLEX.jpg",
+        "PES 2018 ARBICK BY NABEEL-RealTeamPATCH-Adoorkhan-1.05=UP0101-CUSA08282_00.jpg",
+        "PES 2019 PS4 HEN Monster Patch Summer Season 1819 AIO.jpg",
+        "photo_2026-07-17_10-26-46.jpg",
+        "plakops1.jpg",
+        "pope.png",
+        "Pro Evolution Soccer 2017 TheRedDevil Patched Season 17-18.jpg",
+        "Protoype.Biohazard.Bundle.jpg",
+        "rach and clank.jpg",
+        "RAGE2.jpg",
+        "rayman legnd.jpg",
+        "red dead 1.jpg",
+        "Red Dead Redemption 2 [DUPLEX][CUSA08519][Update.v1.29][ARABIC].jpg",
+        "Resident Evil 2 6.72.jpg",
+        "Resident Evil 4 PS4.jpg",
+        "RESIDENT EVIL 5 PS4.jpg",
+        "Resident Evil 6.jpg",
+        "RESIDENT EVIL 7 biohazard Arabic.jpg",
+        "Resident Evil Origins Collection PS4.jpg",
+        "RESIDENT EVIL REVELATIONS PS4.jpg",
+        "Resident Evil Village[CUSA18008].jpg",
+        "Resident_Evil_Revelations_2_PS4-Playable.jpg",
+        "Rise of the Tomb Raider Arabic.jpg",
+        "risen.png",
+        "Road Redemption[CUSA13020].jpg",
+        "rocket league=EP2002-CUSA01433_00-V0117.jpg",
+        "Salt and Sanctuary.jpg",
+        "Sekiro Shadows Die Twice[CUSA13801] 6.72.jpg",
+        "Shadow of the Beast.jpg",
+        "Shadow of the Tomb Raider ARABIC[CUSA12089].jpg",
+        "Shadow of the Tomb Raider[CUSA10872]FIX 5.5].jpg",
+        "SHADOW-OF-THE-COLOSSUS-5.05-www.P30Day.com-EP9000-CUSA08809_00-SOTC0000000000EU-A0100-V0100.jpg",
+        "Shantae Half Genie Hero.jpg",
+        "SHENMUE[CUSA08355].jpg",
+        "Sherlock.Holmes.The.Devils.Daughter.PS4-DUPLEX.jpg",
+        "siperpank.jpg",
+        "Sleeping DogsT Definitive Edition.jpg",
+        "Sniper  Ghost Warrior 3=EP4321-CUSA04854_00.jpg",
+        "Sniper Elite 3.jpg",
+        "Sniper.Elite.4.PS4-DUPLEX.jpg",
+        "snow runner.png",
+        "SONIC COLORS[CUSA19351].jpg",
+        "Sonic Frontiers[CUSA28194].jpg",
+        "Sonic Origins Plus[CUSA30448][Premium Fun Pack DLC].jpg",
+        "SOUL CALIBUR VI[DUPLEX].jpg",
+        "Spider-Man Arabic.jpg",
+        "Spider-Man Miles MoralesS[CUSA20177][ARABIC].jpeg",
+        "Spongebob Squarepants Battle for Bikini Bottom Rehydrated[CUSA14909].jpg",
+        "Spyro Reignited Trilogy[CUSA12085].jpg",
+        "Star Wars Jedi Fallen Order[CUSA12529].jpg",
+        "Stray[CUSA24899].jpg",
+        "STYX SHARDS OF DARKNES.jpg",
+        "TEKEEN 7.jpg",
+        "the crew 2.jpg",
+        "The Evil Within 2.jpg",
+        "The Last Guardian.jpg",
+        "The Last of Us Part 2 [CUSA10249].jpg",
+        "The Last of Us Remastered [CUSA00556].jpg",
+        "The Surge 2[CUSA12567].jpg",
+        "The Witcher 3 Wild Hunt - Game of the Year Edition.jpg",
+        "The.Amazing.Spiderman.2.PS4.jpg",
+        "The.Walking.Dead.The.Complete.First.Season.jpg",
+        "theseus.jpg",
+        "Tom Clancy's Ghost Recon Wildlands=EP0001-CUSA02820_00-GRWMENANORMAL000-A0100-V0100.jpg",
+        "Tomb Raider Definitive Edition.jpg",
+        "Trials Fusion.jpg",
+        "Truck Driver[CUSA12209].jpg",
+        "Uncharted 4 A Thiefs End[CUSA00918][Arabic].jpg",
+        "uncharted 5.jpg",
+        "Uncharted The Nathan Drake Collection.jpg",
+        "Unravel Two.jpg",
+        "Unravel.jpg",
+        "Until.Dawn.PS4-BlaZe.jpg",
+        "Vampyr.jpg",
+        "WATCH DOGS 2 Arabic PS4.jpg",
+        "Watch Dogs Legion[CUSA13115].jpg",
+        "World War Z[CUSA13930].jpg",
+        "Yakuza 6 The Song of Life PS4.jpg",
+        "YAKUZA KIWAMI PS4.jpg",
+        "Yooka Laylee and the Impossible Lair.jpg",
+        "yooka laylee.jpg",
+        "Zombie Army Trilogy.jpg"
+    ];
+
+    let selectedGames = new Set();
+
+    function formatGameName(filename) {
+        let clean = filename.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
+        return clean.replace(/\[.*?\]/g, '').replace(/=.*$/, '').trim();
+    }
+
+    function renderGames(list) {
+        const grid = document.getElementById("gamesGrid");
+        grid.innerHTML = "";
+        list.forEach(file => {
+            const name = formatGameName(file);
+            const isSelected = selectedGames.has(file);
+            const card = document.createElement("div");
+            card.className = `game-card ${isSelected ? 'selected' : ''}`;
+            card.innerHTML = `
+                <img src="images/${encodeURIComponent(file)}" alt="${name}" class="game-img" loading="lazy" onerror="this.closest('.game-card').style.display='none'">
+                <div class="game-info">
+                    <div class="game-title">${name}</div>
+                    <button class="btn-add" onclick="toggleGame('${file.replace(/'/g, "\\'")}')">
+                        ${isSelected ? 'تم الاختيار ✓' : 'إضافة للطلب +'}
+                    </button>
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    function toggleGame(file) {
+        if (selectedGames.has(file)) {
+            selectedGames.delete(file);
+        } else {
+            selectedGames.add(file);
+        }
+        updateCart();
+        filterGames();
+    }
+
+    function updateCart() {
+        const count = selectedGames.size;
+        document.getElementById("selectedCount").innerText = count;
+        document.getElementById("sendBtn").disabled = count === 0;
+    }
+
+    function setCategory(cat, btn) {
+        currentCategory = cat;
+        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        filterGames();
+    }
+
+    function filterGames() {
+        const query = document.getElementById("searchInput").value.toLowerCase();
+        const filtered = imageFiles.filter(file => {
+            const name = formatGameName(file).toLowerCase();
+            const matchesQuery = name.includes(query) || file.toLowerCase().includes(query);
+            
+            if (!matchesQuery) return false;
+
+            if (currentCategory === 'fifa') return name.includes('fifa') || name.includes('pes') || name.includes('efootball');
+            if (currentCategory === 'gta') return name.includes('gta');
+            if (currentCategory === 'cod') return name.includes('call of duty');
+            if (currentCategory === 'god') return name.includes('god of war') || name.includes('assassin') || name.includes('spiderman');
+            
+            return true;
+        });
+        renderGames(filtered);
+    }
+
+    function openModal() { document.getElementById("requestModal").style.display = "flex"; }
+    function closeModal() { document.getElementById("requestModal").style.display = "none"; }
+    
+    function sendMissingGame() {
+        const gameName = document.getElementById("missingGameName").value.trim();
+        if (!gameName) { alert("يرجى كتابة اسم اللعبة أولاً!"); return; }
+        let message = `السلام عليكم مركز النجوم، أرغب بطلب لعبة غير موجودة في المتجر:\n🎮 اسم اللعبة المطلوبة: *${gameName}*`;
+        const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+        window.open(url, "_blank");
+        closeModal();
+        document.getElementById("missingGameName").value = "";
+    }
+
+    function sendToWhatsApp() {
+        if (selectedGames.size === 0) return;
+        let message = "السلام عليكم مركز النجوم، أرغب بتحميل الألعاب التالية:\n\n";
+        let i = 1;
+        selectedGames.forEach(file => {
+            message += `${i}- ${formatGameName(file)}\n`;
+            i++;
+        });
+        const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+        window.open(url, "_blank");
+    }
+
+    renderGames(imageFiles);
+</script>
+
+</body>
+</html>
